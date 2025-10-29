@@ -1,0 +1,232 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Text;
+using System.Threading;
+
+namespace StationeersRCON
+{
+    public class HttpServerManager
+    {
+        private HttpListener listener;
+        private Thread listenerThread;
+        private bool isRunning = false;
+        private string host;
+        private int port;
+
+        public void Initialize(string host, int port)
+        {
+            this.host = host;
+            this.port = port;
+            StartListening();
+        }
+
+        private void StartListening()
+        {
+            try
+            {
+                listener = new HttpListener();
+                
+                // Build the prefix based on host configuration
+                string prefix;
+                if (host == "*" || host == "0.0.0.0")
+                {
+                    prefix = $"http://+:{port}/";
+                }
+                else
+                {
+                    prefix = $"http://{host}:{port}/";
+                }
+                
+                listener.Prefixes.Add(prefix);
+                listener.Start();
+                isRunning = true;
+
+                listenerThread = new Thread(Listen)
+                {
+                    IsBackground = true
+                };
+                listenerThread.Start();
+
+                Plugin.Log.LogInfo($"HTTP Listener started on {prefix}");
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.LogError($"Failed to start HTTP listener: {ex.Message}");
+                throw;
+            }
+        }
+
+        private void Listen()
+        {
+            while (isRunning && listener != null && listener.IsListening)
+            {
+                try
+                {
+                    var context = listener.GetContext();
+                    ThreadPool.QueueUserWorkItem((_) => HandleRequest(context));
+                }
+                catch (HttpListenerException ex)
+                {
+                    if (isRunning)
+                    {
+                        Plugin.Log.LogError($"Listener error: {ex.Message}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Plugin.Log.LogError($"Unexpected error: {ex.Message}");
+                }
+            }
+        }
+
+        private void HandleRequest(HttpListenerContext context)
+        {
+            try
+            {
+                var request = context.Request;
+                var response = context.Response;
+
+                // Set CORS headers
+                response.AddHeader("Access-Control-Allow-Origin", "*");
+                response.AddHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+                response.AddHeader("Access-Control-Allow-Headers", "Content-Type");
+
+                // Handle OPTIONS preflight request
+                if (request.HttpMethod == "OPTIONS")
+                {
+                    response.StatusCode = 204;
+                    response.Close();
+                    return;
+                }
+
+                string responseString = "";
+                int statusCode = 200;
+
+                if (request.Url.AbsolutePath == "/command" && request.HttpMethod == "POST")
+                {
+                    responseString = HandleCommandRequest(request);
+                }
+                else if (request.Url.AbsolutePath == "/health" && request.HttpMethod == "GET")
+                {
+                    responseString = "{\"status\":\"ok\"}";
+                }
+                else
+                {
+                    statusCode = 404;
+                    responseString = "{\"success\":false,\"message\":\"Endpoint not found\"}";
+                }
+
+                byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+                response.ContentLength64 = buffer.Length;
+                response.ContentType = "application/json";
+                response.StatusCode = statusCode;
+                response.OutputStream.Write(buffer, 0, buffer.Length);
+                response.Close();
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.LogError($"Error handling request: {ex.Message}");
+                try
+                {
+                    context.Response.StatusCode = 500;
+                    context.Response.Close();
+                }
+                catch { }
+            }
+        }
+
+        private string HandleCommandRequest(HttpListenerRequest request)
+        {
+            try
+            {
+                string body;
+                using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
+                {
+                    body = reader.ReadToEnd();
+                }
+
+                // Parse JSON manually (simple parsing)
+                string command = ExtractCommandFromJson(body);
+
+                if (string.IsNullOrEmpty(command))
+                {
+                    return "{\"success\":false,\"message\":\"No command provided\"}";
+                }
+
+                // Execute command immediately via Unity main thread dispatcher
+                UnityMainThreadDispatcher.Enqueue(() =>
+                {
+                    try
+                    {
+                        CommandExecutor.ExecuteCommand(command);
+                    }
+                    catch (Exception ex)
+                    {
+                        Plugin.Log.LogError($"Failed to execute command '{command}': {ex.Message}");
+                    }
+                });
+
+                return "{\"success\":true,\"message\":\"Command queued for execution\"}";
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.LogError($"Error processing command: {ex.Message}");
+                return $"{{\"success\":false,\"message\":\"Error: {JsonEscape(ex.Message)}\"}}";
+            }
+        }
+
+        private string ExtractCommandFromJson(string json)
+        {
+            // Simple JSON parsing for {"command":"value"}
+            try
+            {
+                int commandStart = json.IndexOf("\"command\"");
+                if (commandStart == -1) return null;
+
+                int valueStart = json.IndexOf(":", commandStart);
+                if (valueStart == -1) return null;
+
+                int quoteStart = json.IndexOf("\"", valueStart);
+                if (quoteStart == -1) return null;
+
+                int quoteEnd = json.IndexOf("\"", quoteStart + 1);
+                if (quoteEnd == -1) return null;
+
+                return json.Substring(quoteStart + 1, quoteEnd - quoteStart - 1);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private string JsonEscape(string str)
+        {
+            return str.Replace("\\", "\\\\")
+                     .Replace("\"", "\\\"")
+                     .Replace("\n", "\\n")
+                     .Replace("\r", "\\r")
+                     .Replace("\t", "\\t");
+        }
+
+        public void Stop()
+        {
+            isRunning = false;
+
+            if (listener != null && listener.IsListening)
+            {
+                listener.Stop();
+                listener.Close();
+            }
+
+            if (listenerThread != null && listenerThread.IsAlive)
+            {
+                listenerThread.Join(1000);
+            }
+
+            Plugin.Log.LogInfo("HTTP server stopped");
+        }
+    }
+}
