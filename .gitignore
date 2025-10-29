@@ -31,3 +31,5 @@ bld/
 *.dll
 *.pdb
 *.cache
+
+.fake
