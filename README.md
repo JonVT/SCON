@@ -25,6 +25,23 @@ The mod creates a configuration file at `BepInEx/config/StationeersRCON.cfg`:
 Port = 8080
 Host = localhost
 Enabled = true
+ApiKey = 
+```
+
+### Authentication
+
+- **ApiKey**: Optional API key for authentication
+  - If **empty** (default): Localhost connections allowed without authentication, network connections denied
+  - If **set**: All connections require the API key in the `Authorization` header
+  
+**Example with API key:**
+```ini
+ApiKey = your-secret-key-here
+```
+
+Then from SDSM (or any client):
+```
+Authorization: Bearer your-secret-key-here
 ```
 
 ## API Usage
@@ -44,26 +61,87 @@ Enabled = true
 ```json
 {
   "success": true,
-  "message": "Command executed successfully"
+  "message": "Command queued for execution"
+}
+```
+
+### Get Game Information
+
+**Endpoint:** `GET /gameinfo`
+
+**Response (JSON):**
+```json
+{
+  "success": true,
+  "serverPort": 27500,
+  "isServer": true,
+  "worldName": "MyWorld",
+  "rconVersion": "1.0.0",
+  "rconHost": "localhost",
+  "rconPort": 8080
+}
+```
+
+Returns information about the running game instance including:
+- `serverPort` - Game server port (if running as server)
+- `isServer` - Whether instance is running as a server
+- `worldName` - Current world/save name
+- `rconVersion`, `rconHost`, `rconPort` - RCON server details
+
+### Health Check
+
+**Endpoint:** `GET /health`
+
+**Response (JSON):**
+```json
+{
+  "status": "ok"
 }
 ```
 
 ### Example with curl:
 
 ```bash
+# Health check
+curl http://localhost:8080/health
+
+# Get game info
+curl http://localhost:8080/gameinfo
+
+# Execute command without API key (localhost only)
 curl -X POST http://localhost:8080/command \
   -H "Content-Type: application/json" \
+  -d '{"command":"help"}'
+
+# Execute command with API key
+curl -X POST http://localhost:8080/command \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-secret-key-here" \
   -d '{"command":"help"}'
 ```
 
 ### Example with PowerShell:
 
 ```powershell
+# Health check
+Invoke-RestMethod -Uri "http://localhost:8080/health"
+
+# Get game info
+Invoke-RestMethod -Uri "http://localhost:8080/gameinfo"
+
+# Execute command without API key (localhost only)
 $body = @{
     command = "help"
 } | ConvertTo-Json
 
 Invoke-RestMethod -Uri "http://localhost:8080/command" -Method Post -Body $body -ContentType "application/json"
+
+# Execute command with API key
+$headers = @{
+    Authorization = "Bearer your-secret-key-here"
+}
+
+Invoke-RestMethod -Uri "http://localhost:8080/command" -Method Post -Body $body -ContentType "application/json" -Headers $headers
 ```
 
 ## Supported Commands
@@ -83,7 +161,10 @@ Any console command that works in the Stationeers console will work through this
 
 ## Security Warning
 
-⚠️ This mod allows remote command execution. Only use it on trusted networks or localhost. Consider implementing authentication if exposing to a network.
+⚠️ **Authentication:**
+- By default (no API key): Only localhost can connect, network connections are denied
+- With API key configured: All connections require the key in `Authorization` header
+- **Recommended**: Set an API key if exposing to your network
 
 ## License
 

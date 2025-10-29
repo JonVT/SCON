@@ -91,7 +91,7 @@ namespace StationeersRCON
                 // Set CORS headers
                 response.AddHeader("Access-Control-Allow-Origin", "*");
                 response.AddHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-                response.AddHeader("Access-Control-Allow-Headers", "Content-Type");
+                response.AddHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
                 // Handle OPTIONS preflight request
                 if (request.HttpMethod == "OPTIONS")
@@ -101,12 +101,30 @@ namespace StationeersRCON
                     return;
                 }
 
+                // Check authentication
+                if (!IsAuthenticated(request))
+                {
+                    string errorResponse = "{\"success\":false,\"message\":\"Unauthorized: Invalid or missing API key\"}";
+                    byte[] errorBuffer = Encoding.UTF8.GetBytes(errorResponse);
+                    response.StatusCode = 401;
+                    response.ContentType = "application/json";
+                    response.ContentLength64 = errorBuffer.Length;
+                    response.OutputStream.Write(errorBuffer, 0, errorBuffer.Length);
+                    response.Close();
+                    Plugin.Log.LogWarning($"Unauthorized access attempt from {request.RemoteEndPoint}");
+                    return;
+                }
+
                 string responseString = "";
                 int statusCode = 200;
 
                 if (request.Url.AbsolutePath == "/command" && request.HttpMethod == "POST")
                 {
                     responseString = HandleCommandRequest(request);
+                }
+                else if (request.Url.AbsolutePath == "/gameinfo" && request.HttpMethod == "GET")
+                {
+                    responseString = HandleGameInfoRequest();
                 }
                 else if (request.Url.AbsolutePath == "/health" && request.HttpMethod == "GET")
                 {
@@ -134,6 +152,55 @@ namespace StationeersRCON
                     context.Response.Close();
                 }
                 catch { }
+            }
+        }
+
+        private bool IsAuthenticated(HttpListenerRequest request)
+        {
+            // Get configured API key
+            string configuredApiKey = Plugin.ServerApiKey?.Value?.Trim();
+            bool isLocalhost = request.RemoteEndPoint.Address.ToString() == "127.0.0.1" || 
+                              request.RemoteEndPoint.Address.ToString() == "::1";
+
+            // If no API key is configured and request is from localhost, allow it
+            if (string.IsNullOrEmpty(configuredApiKey) && isLocalhost)
+            {
+                return true;
+            }
+
+            // If API key is configured or request is not from localhost, require authentication
+            if (!string.IsNullOrEmpty(configuredApiKey))
+            {
+                // Check Authorization header
+                string authHeader = request.Headers["Authorization"];
+                if (string.IsNullOrEmpty(authHeader))
+                {
+                    return false;
+                }
+
+                // Support "Bearer <token>" or just "<token>"
+                string providedKey = authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                    ? authHeader.Substring(7).Trim()
+                    : authHeader.Trim();
+
+                return providedKey == configuredApiKey;
+            }
+
+            // Non-localhost with no API key configured = deny
+            return false;
+        }
+
+        private string HandleGameInfoRequest()
+        {
+            try
+            {
+                var gameInfo = GameInfoCollector.GetGameInfo();
+                return gameInfo;
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.LogError($"Error getting game info: {ex.Message}");
+                return $"{{\"success\":false,\"message\":\"Error: {JsonEscape(ex.Message)}\"}}";
             }
         }
 

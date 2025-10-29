@@ -15,6 +15,7 @@ namespace StationeersRCON
         public static ConfigEntry<bool> ServerEnabled;
         public static ConfigEntry<string> ServerHost;
         public static ConfigEntry<int> ServerPort;
+        public static ConfigEntry<string> ServerApiKey;
 
         private HttpServerManager httpServer;
 
@@ -41,6 +42,11 @@ namespace StationeersRCON
                 "Port",
                 8080,
                 "Port number for the RCON server");
+
+            ServerApiKey = Config.Bind("Server",
+                "ApiKey",
+                "",
+                "API key for authentication. Leave empty to allow localhost without key. Network connections always require a key.");
 
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} v{PluginInfo.PLUGIN_VERSION} is loaded!");
 
