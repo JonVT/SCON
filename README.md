@@ -14,6 +14,13 @@ Quick links:
 - [Quickstart](./QUICKSTART.md) – Get up and running fast
 - [Project Summary](./PROJECT_SUMMARY.md) – Overview, design, and scope
 
+## Downloads
+
+- Latest release: https://github.com/JonVT/SCON/releases/latest
+- Windows package: download the asset named `SCON-<version>-windows.zip`
+- Linux package: download the asset named `SCON-<version>-linux.zip`
+- Advanced: you can also use the raw `SCON.dll` asset from the release
+
 ## Features
 
 - HTTP API server that listens for command requests
@@ -26,8 +33,11 @@ Quick links:
 1. Install [BepInEx 5.x](https://github.com/BepInEx/BepInEx/releases) for Stationeers
   - Windows: use BepInEx x64 (Mono) and extract into the Stationeers game folder
   - Linux: use BepInEx 5.x x64 for Linux and follow the Linux-specific instructions on the release page
-2. Download the latest release of SCON
-3. Extract `SCON.dll` to `BepInEx/plugins/` folder
+2. Download the latest SCON from the [Releases](https://github.com/JonVT/SCON/releases) page
+  - Windows: download `SCON-<version>-windows.zip`
+  - Linux: download `SCON-<version>-linux.zip`
+  - Advanced: you can also use the raw `SCON.dll` asset if you prefer
+3. Extract/copy `SCON.dll` into the `BepInEx/plugins/` folder
 4. Launch Stationeers
 
 Default game install locations:

@@ -11,8 +11,11 @@
 
 ## Option 1: Install Pre-built Mod (Recommended)
 
-1. Download `SCON.dll` from releases
-2. Copy to `Stationeers/BepInEx/plugins/`
+1. Get the latest from Releases: https://github.com/JonVT/SCON/releases/latest
+  - Windows: download `SCON-<version>-windows.zip`
+  - Linux: download `SCON-<version>-linux.zip`
+  - Advanced: you can also download the raw `SCON.dll` asset
+2. Extract/copy `SCON.dll` to `Stationeers/BepInEx/plugins/`
 3. Launch Stationeers
 4. Check BepInEx console for "SCON server started" message
 

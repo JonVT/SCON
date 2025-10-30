@@ -1,0 +1,144 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore SCON.csproj
+
+      - name: Build (Release)
+        run: dotnet build SCON.csproj -c Release --nologo
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $tag = "$env:GITHUB_REF_NAME"
+          if ([string]::IsNullOrEmpty($tag)) { $tag = "manual" }
+          $dll = "bin/Release/net472/SCON.dll"
+          if (!(Test-Path $dll)) { Write-Error "Build output not found: $dll"; exit 1 }
+          $zip = "SCON-$tag-windows.zip"
+          if (Test-Path $zip) { Remove-Item $zip -Force }
+          Compress-Archive -Path $dll -DestinationPath $zip
+          Write-Host "Created $zip"
+
+      - name: Upload artifact (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: scon-windows
+          path: |
+            bin/Release/net472/SCON.dll
+            SCON-${{ github.ref_name }}-windows.zip
+
+      - name: Package (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME:-manual}"
+          DLL="bin/Release/net472/SCON.dll"
+          test -f "$DLL" || { echo "Build output not found: $DLL" >&2; exit 1; }
+          ZIP="SCON-${TAG}-linux.zip"
+          zip -j "$ZIP" "$DLL"
+          echo "Created $ZIP"
+
+      - name: Upload artifact (Linux)
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: scon-linux
+          path: |
+            bin/Release/net472/SCON.dll
+            SCON-${{ github.ref_name }}-linux.zip
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifacts (Windows)
+        uses: actions/download-artifact@v4
+        with:
+          name: scon-windows
+          path: dist/windows
+
+      - name: Download artifacts (Linux)
+        uses: actions/download-artifact@v4
+        with:
+          name: scon-linux
+          path: dist/linux
+
+      - name: Generate Release Notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          VER="${TAG#v}"
+          if [[ -f CHANGELOG.md ]]; then
+            awk -v ver="$VER" '
+              BEGIN{IGNORECASE=1; insec=0}
+              /^##[[:space:]]*\[?v?([0-9]+\.[0-9]+\.[0-9]+)\]?/ {
+                hdr=$0
+                if (insec==1) exit
+                sec=hdr
+                gsub(/^[#[:space:]]+/, "", sec)
+                gsub(/[\[\]]/, "", sec)
+                split(sec, a, /[[:space:]]*-[[:space:]]*/)
+                vers=a[1]
+                gsub(/^v/, "", vers)
+                if (vers==ver) { insec=1; next }
+              }
+              insec==1 { print }
+            ' CHANGELOG.md > RELEASE_NOTES.md || true
+
+            if [[ ! -s RELEASE_NOTES.md ]]; then
+              echo "No section found for ${VER}; falling back to Unreleased or default." > RELEASE_NOTES.md
+              awk '
+                BEGIN{IGNORECASE=1; insec=0}
+                /^##[[:space:]]*\[?Unreleased\]?/ { insec=1; next }
+                /^##[[:space:]]*\[?/ && insec==1 { exit }
+                insec==1 { print }
+              ' CHANGELOG.md >> RELEASE_NOTES.md || true
+            fi
+          else
+            printf "Automated release for %s.\n\nSee README and QUICKSTART for usage.\n" "$TAG" > RELEASE_NOTES.md
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: SCON ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          body_path: RELEASE_NOTES.md
+          files: |
+            dist/windows/SCON.dll
+            dist/windows/SCON-${{ github.ref_name }}-windows.zip
+            dist/linux/SCON.dll
+            dist/linux/SCON-${{ github.ref_name }}-linux.zip
