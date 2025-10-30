@@ -2,6 +2,11 @@
 
 A BepInEx mod for Stationeers that exposes an HTTP API for executing console commands remotely.
 
+Quick links:
+
+- [Quickstart](./QUICKSTART.md) – Get up and running fast
+- [Project Summary](./PROJECT_SUMMARY.md) – Overview, design, and scope
+
 ## Features
 
 - HTTP API server that listens for command requests
