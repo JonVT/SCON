@@ -10,7 +10,8 @@ Write-Host "Building SCON..." -ForegroundColor Cyan
 # Check if Stationeers path is set
 if ([string]::IsNullOrEmpty($StationeersPath)) {
     Write-Host "Warning: STATIONEERS_PATH environment variable not set." -ForegroundColor Yellow
-    Write-Host "Set it with: `$env:STATIONEERS_PATH = 'C:\Path\To\Stationeers'" -ForegroundColor Yellow
+    Write-Host "Windows (PowerShell): `$env:STATIONEERS_PATH = 'C:\\Path\\To\\Stationeers'" -ForegroundColor Yellow
+    Write-Host "Linux (bash): export STATIONEERS_PATH=\"$HOME/.local/share/Steam/steamapps/common/Stationeers\"" -ForegroundColor Yellow
     Write-Host ""
 }
 
@@ -30,11 +31,14 @@ Write-Host "Build successful!" -ForegroundColor Green
 
 # Install if requested
 if ($Install -and -not [string]::IsNullOrEmpty($StationeersPath)) {
-    $pluginPath = Join-Path $StationeersPath "BepInEx\plugins"
-    
+    # Cross-platform safe path combining
+    $bepPath = Join-Path $StationeersPath "BepInEx"
+    $pluginPath = Join-Path $bepPath "plugins"
+
     if (Test-Path $pluginPath) {
         Write-Host "Installing to $pluginPath..." -ForegroundColor Green
-        Copy-Item "bin\Release\net472\SCON.dll" $pluginPath -Force
+        $outPath = Join-Path (Join-Path (Join-Path "bin" "Release") "net472") "SCON.dll"
+        Copy-Item $outPath $pluginPath -Force
         Write-Host "Installation complete!" -ForegroundColor Green
     } else {
         Write-Host "BepInEx plugins folder not found. Is BepInEx installed?" -ForegroundColor Red
@@ -45,4 +49,4 @@ if ($Install -and -not [string]::IsNullOrEmpty($StationeersPath)) {
 }
 
 Write-Host ""
-Write-Host "Output: bin\Release\net472\SCON.dll" -ForegroundColor Cyan
+Write-Host "Output: $(Join-Path (Join-Path (Join-Path "bin" "Release") "net472") "SCON.dll")" -ForegroundColor Cyan

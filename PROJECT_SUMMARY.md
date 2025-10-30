@@ -133,18 +133,28 @@ curl -X POST http://localhost:8080/command \
 ## Building & Installation
 
 ### Quick Build
+
+Windows (PowerShell):
 ```powershell
 # Set Stationeers path
-$env:STATIONEERS_PATH = "C:\...\Stationeers"
+$env:STATIONEERS_PATH = "C:\\...\\Stationeers"
 
 # Build and install
-.\build.ps1 -Install
+./build.ps1 -Install
+```
+
+Linux (bash):
+```bash
+export STATIONEERS_PATH="$HOME/.local/share/Steam/steamapps/common/Stationeers"
+./build.sh --install
 ```
 
 ### Manual Steps
 1. `dotnet restore`
 2. `dotnet build -c Release`
-3. Copy `bin\Release\net472\SCON.dll` to `Stationeers\BepInEx\plugins\`
+3. Copy the built DLL to the plugins folder:
+  - Windows: `bin\Release\net472\SCON.dll` -> `Stationeers\BepInEx\plugins\`
+  - Linux: `bin/Release/net472/SCON.dll` -> `$STATIONEERS_PATH/BepInEx/plugins/`
 
 ## Configuration
 
@@ -206,8 +216,8 @@ Port = 8080         # Port number
 
 ## Dependencies
 
-- **BepInEx 5.x** - Modding framework
-- **.NET Framework 4.7.2** - Runtime
+- **BepInEx 5.x** - Modding framework (Windows & Linux)
+- **.NET Framework 4.7.2/Mono** - Runtime (via Unity/Mono and BepInEx on Linux)
 - **UnityEngine 2020.3.26** - Game engine APIs
 - **Stationeers Assembly-CSharp** - Game code access
 
@@ -232,3 +242,4 @@ MIT License - Free to use and modify
 - 🔧 [Developer Notes](DEVELOPMENT.md)
 - 💻 [Usage Examples](examples.ps1)
 - ✅ [Test Suite](test.ps1)
+ - 🐧 Linux Build Script (bash): [build.sh](build.sh)

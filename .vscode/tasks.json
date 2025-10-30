@@ -74,6 +74,21 @@
             "type": "shell",
             "command": "${workspaceFolder}/examples.ps1",
             "problemMatcher": []
+        },
+        {
+            "label": "build (Linux)",
+            "type": "shell",
+            "command": "${workspaceFolder}/build.sh",
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "build (Linux: install)",
+            "type": "shell",
+            "command": "${workspaceFolder}/build.sh",
+            "args": ["--install"],
+            "problemMatcher": [],
+            "group": "build"
         }
     ]
 }

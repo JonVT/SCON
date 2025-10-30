@@ -90,50 +90,74 @@ Port = 8080
 ## Usage Examples
 
 ### PowerShell Function
-
-```powershell
-function Send-StationeersCommand {
-    param([string]$Command)
+2. **BepInEx 5.x** installed for Stationeers
+    - Download from: https://github.com/BepInEx/BepInEx/releases
+    - Windows: extract to Stationeers game folder; run game once to generate BepInEx folders
+    - Linux: use the Linux x64 build; extract to the Stationeers folder and follow release notes; run once to generate folders
     
-    $body = @{ command = $Command } | ConvertTo-Json
+## Option 2: Build from Source (Windows & Linux)
     Invoke-RestMethod -Uri "http://localhost:8080/command" `
-        -Method Post `
+### Step 1: Set Environment Variable
         -Body $body `
         -ContentType "application/json"
 }
 
-# Use it
-Send-StationeersCommand "help"
 Send-StationeersCommand "god"
-Send-StationeersCommand "spawn ItemKitSuitSpace"
+Windows (PowerShell):
+```powershell
+# Set your Stationeers installation path
+$env:STATIONEERS_PATH = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Stationeers"
+
+# Or set permanently
+[System.Environment]::SetEnvironmentVariable('STATIONEERS_PATH', 'C:\\...\\Stationeers', 'User')
 ```
 
+Linux (bash):
+```bash
+export STATIONEERS_PATH="$HOME/.local/share/Steam/steamapps/common/Stationeers"
+```
+```
+### Step 2: Build
 ### Using Provided Scripts
 
 ```powershell
 # Run examples
-.\examples.ps1
+Windows (PowerShell):
+```powershell
+# Navigate to project folder
+cd "e:\\Users\\jon\\OneDrive\\Projects\\Stationeers\\SCON"
 
-# Run tests
-.\test.ps1
+# Build the project
+./build.ps1
+
+# Or build and auto-install
+./build.ps1 -Install
 ```
 
-### Python Example
+Linux (bash):
+```bash
+cd "$HOME/path/to/SCON"
+chmod +x build.sh
+./build.sh
 
-```python
-import requests
+# Or build and auto-install
+./build.sh --install
+```
+
+### Step 3: Manual Install (if not using auto-install)
+- Windows: copy `bin\Release\net472\SCON.dll` to `Stationeers\BepInEx\plugins\`
+- Linux: copy `bin/Release/net472/SCON.dll` to `$STATIONEERS_PATH/BepInEx/plugins/`
 import json
-
-def send_command(command):
+2. Verify port is not in use:
+    - Windows (PowerShell): `netstat -an | Select-String 8080`
+    - Linux (bash): `ss -ltnp | grep 8080` or `lsof -i :8080`
     url = "http://localhost:8080/command"
-    payload = {"command": command}
-    response = requests.post(url, json=payload)
-    return response.json()
+2. Check path points to game root (Windows contains `rocketstation.exe`; Linux contains `rocketstation.x86_64`)
+3. Verify `rocketstation_Data/Managed/Assembly-CSharp.dll` exists
 
-# Execute command
-result = send_command("help")
-print(result)
-```
+- Default `localhost:8080` should work without admin
+- Network binding (`Host = *`) may require admin on Windows; on Linux, binding to ports <1024 requires elevated privileges
+- Try changing port in config
 
 ### JavaScript/Node.js Example
 

@@ -26,22 +26,66 @@ namespace SCON
         {
             try
             {
-                listener = new HttpListener();
-                
-                // Build the prefix based on host configuration
-                string prefix;
-                if (host == "*" || host == "0.0.0.0")
+                // Build a list of candidate prefixes to maximize cross-platform compatibility
+                var candidates = new List<string>();
+
+                string h = (host ?? string.Empty).Trim();
+                if (string.IsNullOrEmpty(h))
                 {
-                    prefix = $"http://+:{port}/";
+                    h = "localhost";
+                }
+
+                bool anyHost = h == "*" || h == "+" || h == "0.0.0.0";
+                if (anyHost)
+                {
+                    // Try common wildcard forms first, then explicit binds
+                    candidates.Add($"http://*:{port}/");
+                    candidates.Add($"http://+:{port}/");
+                    candidates.Add($"http://0.0.0.0:{port}/");
+                    candidates.Add($"http://127.0.0.1:{port}/");
                 }
                 else
                 {
-                    prefix = $"http://{host}:{port}/";
+                    candidates.Add($"http://{h}:{port}/");
+                    // Provide a localhost fallback when configured as localhost
+                    if (string.Equals(h, "localhost", StringComparison.OrdinalIgnoreCase))
+                        candidates.Add($"http://127.0.0.1:{port}/");
                 }
-                
-                listener.Prefixes.Add(prefix);
-                listener.Start();
-                isRunning = true;
+
+                Exception lastError = null;
+                string startedPrefix = null;
+
+                foreach (var prefix in candidates)
+                {
+                    try
+                    {
+                        listener = new HttpListener();
+                        listener.Prefixes.Add(prefix);
+                        listener.Start();
+                        isRunning = true;
+                        startedPrefix = prefix;
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        lastError = ex;
+                        try
+                        {
+                            // Clean up this attempt before trying the next
+                            if (listener != null)
+                            {
+                                listener.Close();
+                            }
+                        }
+                        catch { }
+                        listener = null;
+                    }
+                }
+
+                if (!isRunning)
+                {
+                    throw new InvalidOperationException($"Failed to start HTTP listener on any prefix. Last error: {lastError?.Message}");
+                }
 
                 listenerThread = new Thread(Listen)
                 {
@@ -49,7 +93,7 @@ namespace SCON
                 };
                 listenerThread.Start();
 
-                Plugin.Log.LogInfo($"HTTP Listener started on {prefix}");
+                Plugin.Log.LogInfo($"HTTP Listener started on {startedPrefix}");
             }
             catch (Exception ex)
             {

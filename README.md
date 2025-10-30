@@ -17,9 +17,15 @@ Quick links:
 ## Installation
 
 1. Install [BepInEx 5.x](https://github.com/BepInEx/BepInEx/releases) for Stationeers
+  - Windows: use BepInEx x64 (Mono) and extract into the Stationeers game folder
+  - Linux: use BepInEx 5.x x64 for Linux and follow the Linux-specific instructions on the release page
 2. Download the latest release of SCON
 3. Extract `SCON.dll` to `BepInEx/plugins/` folder
 4. Launch Stationeers
+
+Default game install locations:
+- Windows (Steam): `C:\Program Files (x86)\Steam\steamapps\common\Stationeers`
+- Linux (Steam): `$HOME/.local/share/Steam/steamapps/common/Stationeers`
 
 ## Configuration
 
@@ -168,8 +174,12 @@ Any console command that works in the Stationeers console will work through this
 ## Building from Source
 
 1. Set the `STATIONEERS_PATH` environment variable to your Stationeers installation directory
-2. Run `dotnet build`
-3. The compiled DLL will be in `bin/Debug/net472/`
+  - Windows (PowerShell): `$env:STATIONEERS_PATH = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Stationeers"`
+  - Linux (bash): `export STATIONEERS_PATH="$HOME/.local/share/Steam/steamapps/common/Stationeers"`
+2. Build
+  - Windows: run `build.ps1` (optionally `-Install` to copy into BepInEx/plugins)
+  - Linux/macOS: run `./build.sh` (optionally `--install`)
+3. The compiled DLL will be in `bin/Release/net472/`
 
 ## Security Warning
 
@@ -177,6 +187,10 @@ Any console command that works in the Stationeers console will work through this
 - By default (no API key): Only localhost can connect, network connections are denied
 - With API key configured: All connections require the key in `Authorization` header
 - **Recommended**: Set an API key if exposing to your network
+
+⚠️ **Linux notes:**
+- Binding to ports below 1024 requires elevated privileges.
+- Wildcard hosts like `*` may not be supported in all environments; if binding fails, set `Host = localhost` (local only) or a specific interface IP.
 
 ## License
 
