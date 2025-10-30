@@ -26,6 +26,7 @@ Port = 8080
 Host = localhost
 Enabled = true
 ApiKey = 
+AutoBindToServerPortPlusOne = true
 ```
 
 ### Authentication
@@ -43,6 +44,12 @@ Then from SDSM (or any client):
 ```
 Authorization: Bearer your-secret-key-here
 ```
+
+### Dedicated server auto-binding
+
+- When running a dedicated server (headless), RCON will automatically bind to `(game server port + 1)` if `AutoBindToServerPortPlusOne` is `true`.
+- Example: If the game server runs on `27500`, RCON will bind to `27501`.
+- Single-player or when the server port can't be detected: RCON uses the configured `Port`.
 
 ## API Usage
 

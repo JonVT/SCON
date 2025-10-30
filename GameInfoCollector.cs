@@ -1,11 +1,80 @@
 using System;
 using System.Reflection;
 using System.Text;
+using UnityEngine;
 
 namespace StationeersRCON
 {
     public static class GameInfoCollector
     {
+        public static bool TryGetServerPort(out int port, out bool isDedicated)
+        {
+            port = 0;
+            isDedicated = false;
+            try
+            {
+                var assemblyCSharp = Assembly.Load("Assembly-CSharp");
+                Type networkManagerType = null;
+                foreach (var type in assemblyCSharp.GetTypes())
+                {
+                    if (type.Name.Contains("NetworkManager") && !type.Name.Contains("<"))
+                    {
+                        networkManagerType = type;
+                        break;
+                    }
+                }
+
+                bool isServerFlag = false;
+                if (networkManagerType != null)
+                {
+                    var instanceProp = networkManagerType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
+                    var instanceField = networkManagerType.GetField("Instance", BindingFlags.Public | BindingFlags.Static);
+                    object networkManager = instanceProp?.GetValue(null) ?? instanceField?.GetValue(null);
+
+                    if (networkManager != null)
+                    {
+                        foreach (var field in networkManagerType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
+                        {
+                            if (field.Name.ToLower().Contains("port") && field.FieldType == typeof(int))
+                            {
+                                var value = field.GetValue(networkManager);
+                                if (value != null)
+                                {
+                                    int p = (int)value;
+                                    if (p > 0 && p < 65536)
+                                    {
+                                        port = p;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        // server flag
+                        foreach (var prop in networkManagerType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                        {
+                            if (prop.Name.ToLower().Contains("server") && prop.PropertyType == typeof(bool))
+                            {
+                                var value = prop.GetValue(networkManager);
+                                if (value is bool b)
+                                {
+                                    isServerFlag = isServerFlag || b;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Dedicated server if running headless or server flag true
+                isDedicated = Application.isBatchMode || isServerFlag;
+                return port != 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static string GetGameInfo()
         {
             var sb = new StringBuilder();
@@ -113,7 +182,7 @@ namespace StationeersRCON
             // Add RCON info
             sb.Append($"\"rconVersion\":\"1.0.0\",");
             sb.Append($"\"rconHost\":\"{Plugin.ServerHost.Value}\",");
-            sb.Append($"\"rconPort\":{Plugin.ServerPort.Value}");
+            sb.Append($"\"rconPort\":{Plugin.CurrentRconPort}");
             
             sb.Append("}");
             return sb.ToString();

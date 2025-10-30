@@ -34,4 +34,9 @@
     </Reference>
   </ItemGroup>
 
+  <!-- Exclude stray local variants from compilation -->
+  <ItemGroup>
+    <Compile Remove="GameInfoCollector-Jon-PC.cs" />
+  </ItemGroup>
+
 </Project>

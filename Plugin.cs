@@ -16,6 +16,10 @@ namespace StationeersRCON
         public static ConfigEntry<string> ServerHost;
         public static ConfigEntry<int> ServerPort;
         public static ConfigEntry<string> ServerApiKey;
+        public static ConfigEntry<bool> AutoBindToServerPortPlusOne;
+
+    // Actual bound RCON port (may differ from configured ServerPort when auto-binding)
+    public static int CurrentRconPort;
 
         private HttpServerManager httpServer;
 
@@ -42,11 +46,15 @@ namespace StationeersRCON
                 "Port",
                 8080,
                 "Port number for the RCON server");
-
             ServerApiKey = Config.Bind("Server",
                 "ApiKey",
                 "",
                 "API key for authentication. Leave empty to allow localhost without key. Network connections always require a key.");
+
+            AutoBindToServerPortPlusOne = Config.Bind("Server",
+                "AutoBindToServerPortPlusOne",
+                true,
+                "If true and running a dedicated server, bind RCON to (game server port + 1). Otherwise use configured Port.");
 
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} v{PluginInfo.PLUGIN_VERSION} is loaded!");
 
@@ -62,10 +70,22 @@ namespace StationeersRCON
             {
                 // Ensure main thread dispatcher exists
                 var dispatcher = UnityMainThreadDispatcher.Instance;
-                
+
+                // Decide which port to bind
+                int desiredPort = ServerPort.Value;
+                bool isDedicated = false;
+                int detectedServerPort;
+                if (AutoBindToServerPortPlusOne.Value && GameInfoCollector.TryGetServerPort(out detectedServerPort, out isDedicated) && isDedicated)
+                {
+                    desiredPort = detectedServerPort + 1;
+                    Logger.LogInfo($"Auto-binding RCON to dedicated server port+1: {desiredPort} (server port {detectedServerPort})");
+                }
+
+                CurrentRconPort = desiredPort;
+
                 httpServer = new HttpServerManager();
-                httpServer.Initialize(ServerHost.Value, ServerPort.Value);
-                Logger.LogInfo($"RCON server started on {ServerHost.Value}:{ServerPort.Value}");
+                httpServer.Initialize(ServerHost.Value, desiredPort);
+                Logger.LogInfo($"RCON server started on {ServerHost.Value}:{desiredPort}");
             }
             catch (System.Exception ex)
             {
