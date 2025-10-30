@@ -1,4 +1,4 @@
-# Quick Start Guide - StationeersRCON
+# Quick Start Guide - SCON
 
 ## Prerequisites
 
@@ -11,10 +11,10 @@
 
 ## Option 1: Install Pre-built Mod (Recommended)
 
-1. Download `StationeersRCON.dll` from releases
+1. Download `SCON.dll` from releases
 2. Copy to `Stationeers/BepInEx/plugins/`
 3. Launch Stationeers
-4. Check BepInEx console for "RCON server started" message
+4. Check BepInEx console for "SCON server started" message
 
 ## Option 2: Build from Source
 
@@ -34,7 +34,7 @@ Or set permanently:
 
 ```powershell
 # Navigate to project folder
-cd "e:\Users\jon\OneDrive\Projects\Stationeers\RCON"
+cd "e:\Users\jon\OneDrive\Projects\Stationeers\SCON"
 
 # Build the project
 .\build.ps1
@@ -45,13 +45,13 @@ cd "e:\Users\jon\OneDrive\Projects\Stationeers\RCON"
 
 ### Step 3: Manual Install (if not using -Install flag)
 
-Copy `bin\Release\net472\StationeersRCON.dll` to `Stationeers\BepInEx\plugins\`
+Copy `bin\Release\net472\SCON.dll` to `Stationeers\BepInEx\plugins\`
 
 ## First Run
 
 1. **Start Stationeers**
 2. **Check BepInEx Console** (press F5 if not visible)
-   - Look for: `RCON server started on localhost:8080`
+    - Look for: `SCON server started on localhost:8080`
 3. **Test the API**:
 
 ```powershell
@@ -65,7 +65,7 @@ Invoke-RestMethod -Uri "http://localhost:8080/command" -Method Post -Body $body 
 
 ## Configuration
 
-Config file location: `Stationeers\BepInEx\config\StationeersRCON.cfg`
+Config file location: `Stationeers\BepInEx\config\SCON.cfg`
 
 ```ini
 [Server]
@@ -155,7 +155,7 @@ sendCommand('help').then(console.log);
 
 ## Troubleshooting
 
-### "RCON server not responding"
+### "SCON server not responding"
 
 1. Check if mod is loaded in BepInEx console
 2. Verify port is not in use: `netstat -an | Select-String 8080`

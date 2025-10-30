@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace StationeersRCON
+namespace SCON
 {
     public static class CommandExecutor
     {

@@ -1,4 +1,4 @@
-# Stationeers RCON API Mod
+# Stationeers SCON API Mod
 
 A BepInEx mod for Stationeers that exposes an HTTP API for executing console commands remotely.
 
@@ -12,13 +12,13 @@ A BepInEx mod for Stationeers that exposes an HTTP API for executing console com
 ## Installation
 
 1. Install [BepInEx 5.x](https://github.com/BepInEx/BepInEx/releases) for Stationeers
-2. Download the latest release of StationeersRCON
-3. Extract `StationeersRCON.dll` to `BepInEx/plugins/` folder
+2. Download the latest release of SCON
+3. Extract `SCON.dll` to `BepInEx/plugins/` folder
 4. Launch Stationeers
 
 ## Configuration
 
-The mod creates a configuration file at `BepInEx/config/StationeersRCON.cfg`:
+The mod creates a configuration file at `BepInEx/config/SCON.cfg`:
 
 ```ini
 [Server]
@@ -40,16 +40,16 @@ AutoBindToServerPortPlusOne = true
 ApiKey = your-secret-key-here
 ```
 
-Then from SDSM (or any client):
+Then from any client:
 ```
 Authorization: Bearer your-secret-key-here
 ```
 
 ### Dedicated server auto-binding
 
-- When running a dedicated server (headless), RCON will automatically bind to `(game server port + 1)` if `AutoBindToServerPortPlusOne` is `true`.
-- Example: If the game server runs on `27500`, RCON will bind to `27501`.
-- Single-player or when the server port can't be detected: RCON uses the configured `Port`.
+- When running a dedicated server (headless), SCON will automatically bind to `(game server port + 1)` if `AutoBindToServerPortPlusOne` is `true`.
+- Example: If the game server runs on `27500`, SCON will bind to `27501`.
+- Single-player or when the server port can't be detected: SCON uses the configured `Port`.
 
 ## API Usage
 
@@ -93,7 +93,7 @@ Returns information about the running game instance including:
 - `serverPort` - Game server port (if running as server)
 - `isServer` - Whether instance is running as a server
 - `worldName` - Current world/save name
-- `rconVersion`, `rconHost`, `rconPort` - RCON server details
+- `rconVersion`, `rconHost`, `rconPort` - SCON server details
 
 ### Health Check
 

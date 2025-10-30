@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/StationeersRCON.csproj",
+                "${workspaceFolder}/SCON.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -23,7 +23,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/StationeersRCON.csproj",
+                "${workspaceFolder}/SCON.csproj",
                 "-c",
                 "Release",
                 "/property:GenerateFullPaths=true",
@@ -46,7 +46,7 @@
             "type": "process",
             "args": [
                 "clean",
-                "${workspaceFolder}/StationeersRCON.csproj",
+                "${workspaceFolder}/SCON.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -58,7 +58,7 @@
             "type": "process",
             "args": [
                 "restore",
-                "${workspaceFolder}/StationeersRCON.csproj"
+                "${workspaceFolder}/SCON.csproj"
             ],
             "problemMatcher": "$msCompile"
         },

@@ -1,8 +1,8 @@
-# StationeersRCON - Project Summary
+# SCON - Project Summary
 
 ## What This Mod Does
 
-StationeersRCON is a BepInEx mod for Stationeers that exposes an HTTP REST API, allowing you to send console commands to the game from external applications. This enables automation, remote control, and integration with other tools.
+SCON is a BepInEx mod for Stationeers that exposes an HTTP REST API, allowing you to send console commands to the game from external applications. This enables automation, remote control, and integration with other tools.
 
 ## Key Features
 
@@ -17,7 +17,7 @@ StationeersRCON is a BepInEx mod for Stationeers that exposes an HTTP REST API, 
 ## Project Structure
 
 ```
-StationeersRCON/
+SCON/
 ├── Source Code
 │   ├── Plugin.cs              # BepInEx plugin entry point
 │   ├── PluginInfo.cs          # Plugin metadata
@@ -36,12 +36,12 @@ StationeersRCON/
 │   └── examples.ps1           # Usage examples
 │
 ├── Configuration
-│   ├── StationeersRCON.csproj # Project file
+│   ├── SCON.csproj # Project file
 │   ├── .gitignore             # Git ignore rules
 │   └── .vscode/               # VS Code tasks & settings
 │
 └── Output
-    └── bin/Release/net472/StationeersRCON.dll  # Compiled mod
+    └── bin/Release/net472/SCON.dll  # Compiled mod
 ```
 
 ## Technical Architecture
@@ -144,11 +144,11 @@ $env:STATIONEERS_PATH = "C:\...\Stationeers"
 ### Manual Steps
 1. `dotnet restore`
 2. `dotnet build -c Release`
-3. Copy `bin\Release\net472\StationeersRCON.dll` to `Stationeers\BepInEx\plugins\`
+3. Copy `bin\Release\net472\SCON.dll` to `Stationeers\BepInEx\plugins\`
 
 ## Configuration
 
-File: `Stationeers\BepInEx\config\StationeersRCON.cfg`
+File: `Stationeers\BepInEx\config\SCON.cfg`
 
 ```ini
 [Server]

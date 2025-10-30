@@ -1,10 +1,10 @@
-# Test script for StationeersRCON API
+# Test script for SCON API
 
 param(
     [string]$ServerUrl = "http://localhost:8080"
 )
 
-Write-Host "StationeersRCON Test Suite" -ForegroundColor Cyan
+Write-Host "SCON Test Suite" -ForegroundColor Cyan
 Write-Host "==========================" -ForegroundColor Cyan
 Write-Host ""
 

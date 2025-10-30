@@ -19,7 +19,7 @@
 
 ## Configuration
 
-Configuration file is automatically created at: `BepInEx/config/StationeersRCON.cfg`
+Configuration file is automatically created at: `BepInEx/config/SCON.cfg`
 
 ```ini
 [Server]
@@ -62,7 +62,7 @@ If the main method fails, it tries alternative approaches:
 ## Testing
 
 1. Start Stationeers with the mod installed
-2. Check BepInEx console for "RCON server started" message
+2. Check BepInEx console for "SCON server started" message
 3. Test health endpoint:
    ```powershell
    Invoke-RestMethod -Uri "http://localhost:8080/health"

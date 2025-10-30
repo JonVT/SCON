@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <AssemblyName>StationeersRCON</AssemblyName>
-    <Description>RCON API mod for Stationeers</Description>
+    <AssemblyName>SCON</AssemblyName>
+    <Description>SCON API mod for Stationeers</Description>
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>

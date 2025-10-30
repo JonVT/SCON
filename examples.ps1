@@ -1,4 +1,4 @@
-# Example API usage script for StationeersRCON
+# Example API usage script for SCON
 
 $baseUrl = "http://localhost:8080"
 
@@ -28,7 +28,7 @@ function Invoke-StationeersCommand {
     }
 }
 
-function Test-RCONHealth {
+function Test-SCONHealth {
     param([string]$ServerUrl = $baseUrl)
     
     try {
@@ -43,13 +43,13 @@ function Test-RCONHealth {
 }
 
 # Example usage
-Write-Host "StationeersRCON API Examples" -ForegroundColor Cyan
+Write-Host "SCON API Examples" -ForegroundColor Cyan
 Write-Host "=============================" -ForegroundColor Cyan
 Write-Host ""
 
 # Check health
 Write-Host "Checking server health..." -ForegroundColor Yellow
-Test-RCONHealth
+Test-SCONHealth
 Write-Host ""
 
 # Example commands

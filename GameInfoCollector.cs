@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 
-namespace StationeersRCON
+namespace SCON
 {
     public static class GameInfoCollector
     {

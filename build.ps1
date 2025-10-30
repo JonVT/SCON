@@ -1,11 +1,11 @@
-# Build script for StationeersRCON mod
+# Build script for SCON mod
 
 param(
     [string]$StationeersPath = $env:STATIONEERS_PATH,
     [switch]$Install
 )
 
-Write-Host "Building StationeersRCON..." -ForegroundColor Cyan
+Write-Host "Building SCON..." -ForegroundColor Cyan
 
 # Check if Stationeers path is set
 if ([string]::IsNullOrEmpty($StationeersPath)) {
@@ -16,10 +16,10 @@ if ([string]::IsNullOrEmpty($StationeersPath)) {
 
 # Restore and build
 Write-Host "Restoring NuGet packages..." -ForegroundColor Green
-dotnet restore StationeersRCON.csproj
+dotnet restore SCON.csproj
 
 Write-Host "Building project..." -ForegroundColor Green
-$buildResult = dotnet build StationeersRCON.csproj -c Release
+$buildResult = dotnet build SCON.csproj -c Release
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Build failed!" -ForegroundColor Red
@@ -34,7 +34,7 @@ if ($Install -and -not [string]::IsNullOrEmpty($StationeersPath)) {
     
     if (Test-Path $pluginPath) {
         Write-Host "Installing to $pluginPath..." -ForegroundColor Green
-        Copy-Item "bin\Release\net472\StationeersRCON.dll" $pluginPath -Force
+        Copy-Item "bin\Release\net472\SCON.dll" $pluginPath -Force
         Write-Host "Installation complete!" -ForegroundColor Green
     } else {
         Write-Host "BepInEx plugins folder not found. Is BepInEx installed?" -ForegroundColor Red
@@ -45,4 +45,4 @@ if ($Install -and -not [string]::IsNullOrEmpty($StationeersPath)) {
 }
 
 Write-Host ""
-Write-Host "Output: bin\Release\net472\StationeersRCON.dll" -ForegroundColor Cyan
+Write-Host "Output: bin\Release\net472\SCON.dll" -ForegroundColor Cyan

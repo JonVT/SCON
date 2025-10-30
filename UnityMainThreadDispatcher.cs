@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace StationeersRCON
+namespace SCON
 {
     /// <summary>
     /// Dispatcher to execute actions on Unity's main thread

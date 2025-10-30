@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 
-namespace StationeersRCON
+namespace SCON
 {
     public class HttpServerManager
     {
