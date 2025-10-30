@@ -81,6 +81,23 @@ Game Engine
 
 ## API Reference
 
+### GET /version
+Return plugin and assembly version information
+
+**Response:**
+```json
+{
+  "success": true,
+  "name": "SCON",
+  "guid": "com.stationeers.scon",
+  "version": "1.0.0",
+  "assemblyVersion": "1.0.0.0",
+  "informationalVersion": "1.0.0",
+  "host": "localhost",
+  "port": 8080
+}
+```
+
 ### POST /command
 Execute a console command
 

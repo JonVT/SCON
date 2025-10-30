@@ -5,6 +5,13 @@
     <AssemblyName>SCON</AssemblyName>
     <Description>SCON API mod for Stationeers</Description>
     <Version>1.0.0</Version>
+    <!-- Used by BepInEx.PluginInfoProps to generate MyPluginInfo.cs -->
+    <BepInExPluginGuid>com.stationeers.scon</BepInExPluginGuid>
+    <BepInExPluginName>SCON</BepInExPluginName>
+    <!-- Explicit assembly metadata for the built DLL -->
+    <AssemblyVersion>$(Version).0</AssemblyVersion>
+    <FileVersion>$(Version).0</FileVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>

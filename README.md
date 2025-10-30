@@ -1,5 +1,12 @@
 # Stationeers SCON API Mod
 
+<!-- VERSION_BADGE_START -->
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+<!-- VERSION_BADGE_END -->
+
+[![Build](https://github.com/JonVT/SCON/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/JonVT/SCON/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/JonVT/SCON)](https://github.com/JonVT/SCON/releases)
+
 A BepInEx mod for Stationeers that exposes an HTTP API for executing console commands remotely.
 
 Quick links:
@@ -63,6 +70,24 @@ Authorization: Bearer your-secret-key-here
 - Single-player or when the server port can't be detected: SCON uses the configured `Port`.
 
 ## API Usage
+
+### Get Version
+
+**Endpoint:** `GET /version`
+
+**Response (JSON):**
+```json
+{
+  "success": true,
+  "name": "SCON",
+  "guid": "com.stationeers.scon",
+  "version": "<plugin-version>",
+  "assemblyVersion": "<assembly-version>",
+  "informationalVersion": "<informational-version>",
+  "host": "localhost",
+  "port": 8080
+}
+```
 
 ### Execute Command
 

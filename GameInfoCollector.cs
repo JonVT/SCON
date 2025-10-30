@@ -180,7 +180,7 @@ namespace SCON
             }
             
             // Add RCON info
-            sb.Append($"\"rconVersion\":\"1.0.0\",");
+            sb.Append($"\"rconVersion\":\"{MyPluginInfo.PLUGIN_VERSION}\",");
             sb.Append($"\"rconHost\":\"{Plugin.ServerHost.Value}\",");
             sb.Append($"\"rconPort\":{Plugin.CurrentRconPort}");
             

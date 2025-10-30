@@ -1,0 +1,58 @@
+name: Update README version badge
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-badge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from csproj
+        id: getver
+        shell: bash
+        run: |
+          set -euo pipefail
+          VER=$(grep -oPm1 '(?<=<Version>)[^<]+' SCON.csproj || true)
+          if [ -z "$VER" ]; then
+            echo "Could not determine version from SCON.csproj" >&2
+            exit 1
+          fi
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+
+      - name: Update README badge
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION='${{ steps.getver.outputs.version }}'
+          BADGE_LINE="![Version](https://img.shields.io/badge/version-${VERSION}-blue.svg)"
+          awk -v badge="$BADGE_LINE" '
+            /<!-- VERSION_BADGE_START -->/ {print; print badge; skip=1; next}
+            /<!-- VERSION_BADGE_END -->/ {print; skip=0; next}
+            skip==1 {next}
+            {print}
+          ' README.md > README.md.tmp
+          mv README.md.tmp README.md
+
+      - name: Commit changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet README.md; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "chore(ci): update README version badge to ${{ steps.getver.outputs.version }}"
+          git push

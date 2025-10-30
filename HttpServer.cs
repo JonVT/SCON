@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Reflection;
 using System.Threading;
 
 namespace SCON
@@ -170,6 +171,10 @@ namespace SCON
                 {
                     responseString = HandleGameInfoRequest();
                 }
+                else if (request.Url.AbsolutePath == "/version" && request.HttpMethod == "GET")
+                {
+                    responseString = HandleVersionRequest();
+                }
                 else if (request.Url.AbsolutePath == "/health" && request.HttpMethod == "GET")
                 {
                     responseString = "{\"status\":\"ok\"}";
@@ -196,6 +201,38 @@ namespace SCON
                     context.Response.Close();
                 }
                 catch { }
+            }
+        }
+
+        private string HandleVersionRequest()
+        {
+            try
+            {
+                var asm = typeof(Plugin).Assembly;
+                string assemblyVersion = asm.GetName()?.Version?.ToString() ?? "";
+                string informationalVersion = asm
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                    .InformationalVersion ?? "";
+
+                var sb = new StringBuilder();
+                sb.Append("{");
+                sb.Append("\"success\":true,");
+                sb.AppendFormat("\"name\":\"{0}\",", JsonEscape(MyPluginInfo.PLUGIN_NAME));
+                sb.AppendFormat("\"guid\":\"{0}\",", JsonEscape(MyPluginInfo.PLUGIN_GUID));
+                sb.AppendFormat("\"version\":\"{0}\",", JsonEscape(MyPluginInfo.PLUGIN_VERSION));
+                if (!string.IsNullOrEmpty(assemblyVersion))
+                    sb.AppendFormat("\"assemblyVersion\":\"{0}\",", JsonEscape(assemblyVersion));
+                if (!string.IsNullOrEmpty(informationalVersion))
+                    sb.AppendFormat("\"informationalVersion\":\"{0}\",", JsonEscape(informationalVersion));
+                sb.AppendFormat("\"host\":\"{0}\",", JsonEscape(Plugin.ServerHost.Value));
+                sb.AppendFormat("\"port\":{0}", Plugin.CurrentRconPort);
+                sb.Append("}");
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.LogError($"Error building version response: {ex.Message}");
+                return "{\"success\":false,\"message\":\"Failed to get version\"}";
             }
         }
 
