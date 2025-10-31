@@ -19,6 +19,27 @@
 3. Launch Stationeers
 4. Check BepInEx console for "SCON server started" message
 
+Advanced: Fetch latest via GitHub API
+```bash
+# Show latest release JSON
+curl -H "Accept: application/vnd.github+json" \
+  https://api.github.com/repos/JonVT/SCON/releases/latest
+
+# Download Windows zip
+curl -s -H "Accept: application/vnd.github+json" \
+  https://api.github.com/repos/JonVT/SCON/releases/latest \
+  | jq -r '.assets[] | select(.name|test("SCON-.*-windows\\.zip$")) | .browser_download_url' \
+  | xargs -n1 -I{} curl -L -o SCON-latest-windows.zip {}
+```
+
+PowerShell (Windows):
+```powershell
+$headers = @{ "Accept" = "application/vnd.github+json" }
+$rel = Invoke-RestMethod -Uri "https://api.github.com/repos/JonVT/SCON/releases/latest" -Headers $headers
+$asset = $rel.assets | Where-Object { $_.name -like "SCON-*-windows.zip" } | Select-Object -First 1
+Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $asset.name
+```
+
 ## Option 2: Build from Source (Windows & Linux)
 
 ### Step 1: Set STATIONEERS_PATH

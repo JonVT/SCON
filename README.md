@@ -21,6 +21,39 @@ Quick links:
 - Linux package: download the asset named `SCON-<version>-linux.zip`
 - Advanced: you can also use the raw `SCON.dll` asset from the release
 
+### Latest release via GitHub API (advanced)
+
+- Endpoint: `https://api.github.com/repos/JonVT/SCON/releases/latest`
+
+curl (Linux/macOS):
+```bash
+curl -H "Accept: application/vnd.github+json" \
+  https://api.github.com/repos/JonVT/SCON/releases/latest
+
+# Download Windows zip
+curl -s -H "Accept: application/vnd.github+json" \
+  https://api.github.com/repos/JonVT/SCON/releases/latest \
+  | jq -r '.assets[] | select(.name|test("SCON-.*-windows\\.zip$")) | .browser_download_url' \
+  | xargs -n1 -I{} curl -L -o SCON-latest-windows.zip {}
+
+# Download Linux zip
+curl -s -H "Accept: application/vnd.github+json" \
+  https://api.github.com/repos/JonVT/SCON/releases/latest \
+  | jq -r '.assets[] | select(.name|test("SCON-.*-linux\\.zip$")) | .browser_download_url' \
+  | xargs -n1 -I{} curl -L -o SCON-latest-linux.zip {}
+```
+
+PowerShell (Windows):
+```powershell
+$headers = @{ "Accept" = "application/vnd.github+json" }
+$rel = Invoke-RestMethod -Uri "https://api.github.com/repos/JonVT/SCON/releases/latest" -Headers $headers
+$zipWin = $rel.assets | Where-Object { $_.name -like "SCON-*-windows.zip" } | Select-Object -First 1
+if ($zipWin) { Invoke-WebRequest -Uri $zipWin.browser_download_url -OutFile $zipWin.name }
+
+$zipLin = $rel.assets | Where-Object { $_.name -like "SCON-*-linux.zip" } | Select-Object -First 1
+if ($zipLin) { Invoke-WebRequest -Uri $zipLin.browser_download_url -OutFile $zipLin.name }
+```
+
 ## Features
 
 - HTTP API server that listens for command requests

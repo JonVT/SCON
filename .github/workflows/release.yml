@@ -136,6 +136,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           draft: false
           prerelease: false
+          make_latest: true
           body_path: RELEASE_NOTES.md
           files: |
             dist/windows/SCON.dll
