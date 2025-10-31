@@ -1,7 +1,7 @@
 # Stationeers SCON API Mod
 
 <!-- VERSION_BADGE_START -->
-![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)
 <!-- VERSION_BADGE_END -->
 
 [![Build](https://github.com/JonVT/SCON/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/JonVT/SCON/actions/workflows/ci.yml)
