@@ -225,7 +225,7 @@ namespace SCON
                 if (!string.IsNullOrEmpty(informationalVersion))
                     sb.AppendFormat("\"informationalVersion\":\"{0}\",", JsonEscape(informationalVersion));
                 sb.AppendFormat("\"host\":\"{0}\",", JsonEscape(Plugin.ServerHost.Value));
-                sb.AppendFormat("\"port\":{0}", Plugin.CurrentRconPort);
+                sb.AppendFormat("\"port\":{0}", Plugin.CurrentSconPort);
                 sb.Append("}");
                 return sb.ToString();
             }

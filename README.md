@@ -162,9 +162,9 @@ Authorization: Bearer your-secret-key-here
   "serverPort": 27500,
   "isServer": true,
   "worldName": "MyWorld",
-  "rconVersion": "1.0.0",
-  "rconHost": "localhost",
-  "rconPort": 8080
+  "sconVersion": "1.0.0",
+  "sconHost": "localhost",
+  "sconPort": 8080
 }
 ```
 
@@ -172,7 +172,7 @@ Returns information about the running game instance including:
 - `serverPort` - Game server port (if running as server)
 - `isServer` - Whether instance is running as a server
 - `worldName` - Current world/save name
-- `rconVersion`, `rconHost`, `rconPort` - SCON server details
+- `sconVersion`, `sconHost`, `sconPort` - SCON server details
 
 ### Health Check
 

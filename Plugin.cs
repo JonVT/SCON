@@ -18,8 +18,8 @@ namespace SCON
         public static ConfigEntry<string> ServerApiKey;
         public static ConfigEntry<bool> AutoBindToServerPortPlusOne;
 
-    // Actual bound RCON port (may differ from configured ServerPort when auto-binding)
-    public static int CurrentRconPort;
+    // Actual bound SCON port (may differ from configured ServerPort when auto-binding)
+    public static int CurrentSconPort;
 
         private HttpServerManager httpServer;
 
@@ -35,7 +35,7 @@ namespace SCON
             ServerEnabled = Config.Bind("Server",
                 "Enabled",
                 true,
-                "Enable or disable the RCON server");
+                "Enable or disable the SCON server");
 
             ServerHost = Config.Bind("Server",
                 "Host",
@@ -45,7 +45,7 @@ namespace SCON
             ServerPort = Config.Bind("Server",
                 "Port",
                 8080,
-                "Port number for the RCON server");
+                "Port number for the SCON server");
             ServerApiKey = Config.Bind("Server",
                 "ApiKey",
                 "",
@@ -54,7 +54,7 @@ namespace SCON
             AutoBindToServerPortPlusOne = Config.Bind("Server",
                 "AutoBindToServerPortPlusOne",
                 true,
-                "If true and running a dedicated server, bind RCON to (game server port + 1). Otherwise use configured Port.");
+                "If true and running a dedicated server, bind SCON to (game server port + 1). Otherwise use configured Port.");
 
             Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} is loaded!");
 
@@ -78,18 +78,18 @@ namespace SCON
                 if (AutoBindToServerPortPlusOne.Value && GameInfoCollector.TryGetServerPort(out detectedServerPort, out isDedicated) && isDedicated)
                 {
                     desiredPort = detectedServerPort + 1;
-                    Logger.LogInfo($"Auto-binding RCON to dedicated server port+1: {desiredPort} (server port {detectedServerPort})");
+                    Logger.LogInfo($"Auto-binding SCON to dedicated server port+1: {desiredPort} (server port {detectedServerPort})");
                 }
 
-                CurrentRconPort = desiredPort;
+                CurrentSconPort = desiredPort;
 
                 httpServer = new HttpServerManager();
                 httpServer.Initialize(ServerHost.Value, desiredPort);
-                Logger.LogInfo($"RCON server started on {ServerHost.Value}:{desiredPort}");
+                Logger.LogInfo($"SCON server started on {ServerHost.Value}:{desiredPort}");
             }
             catch (System.Exception ex)
             {
-                Logger.LogError($"Failed to start RCON server: {ex.Message}");
+                Logger.LogError($"Failed to start SCON server: {ex.Message}");
             }
         }
 
@@ -105,7 +105,7 @@ namespace SCON
 
         private void OnApplicationQuit()
         {
-            Logger.LogInfo("Application quitting - stopping RCON server");
+            Logger.LogInfo("Application quitting - stopping SCON server");
             if (httpServer != null)
             {
                 httpServer.Stop();

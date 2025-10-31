@@ -33,11 +33,11 @@ function Test-SCONHealth {
     
     try {
         $response = Invoke-RestMethod -Uri "$ServerUrl/health" -Method Get
-        Write-Host "✓ RCON server is healthy" -ForegroundColor Green
+        Write-Host "✓ SCON server is healthy" -ForegroundColor Green
         return $true
     }
     catch {
-        Write-Host "✗ RCON server is not responding" -ForegroundColor Red
+        Write-Host "✗ SCON server is not responding" -ForegroundColor Red
         return $false
     }
 }

@@ -179,10 +179,10 @@ namespace SCON
                 Plugin.Log.LogWarning($"Could not retrieve all game info: {ex.Message}");
             }
             
-            // Add RCON info
-            sb.Append($"\"rconVersion\":\"{MyPluginInfo.PLUGIN_VERSION}\",");
-            sb.Append($"\"rconHost\":\"{Plugin.ServerHost.Value}\",");
-            sb.Append($"\"rconPort\":{Plugin.CurrentRconPort}");
+            // Add SCON info
+            sb.Append($"\"sconVersion\":\"{MyPluginInfo.PLUGIN_VERSION}\",");
+            sb.Append($"\"sconHost\":\"{Plugin.ServerHost.Value}\",");
+            sb.Append($"\"sconPort\":{Plugin.CurrentSconPort}");
             
             sb.Append("}");
             return sb.ToString();
