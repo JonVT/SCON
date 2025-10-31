@@ -4,7 +4,7 @@
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>SCON</AssemblyName>
     <Description>SCON API mod for Stationeers</Description>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <!-- Used by BepInEx.PluginInfoProps to generate MyPluginInfo.cs -->
     <BepInExPluginGuid>com.stationeers.scon</BepInExPluginGuid>
     <BepInExPluginName>SCON</BepInExPluginName>
@@ -30,7 +30,7 @@
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.1" PrivateAssets="all" />
   </ItemGroup>
 
   <!-- Reference Stationeers assemblies -->
