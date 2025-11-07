@@ -1,0 +1,94 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/SCON.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "build (Release)",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/SCON.csproj",
+                "-c",
+                "Release",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": "build"
+        },
+        {
+            "label": "build and install",
+            "type": "shell",
+            "command": "${workspaceFolder}/build.ps1",
+            "args": ["-Install"],
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "clean",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/SCON.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "restore",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "restore",
+                "${workspaceFolder}/SCON.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test api",
+            "type": "shell",
+            "command": "${workspaceFolder}/test.ps1",
+            "problemMatcher": [],
+            "group": "test"
+        },
+        {
+            "label": "run examples",
+            "type": "shell",
+            "command": "${workspaceFolder}/examples.ps1",
+            "problemMatcher": []
+        },
+        {
+            "label": "build (Linux)",
+            "type": "shell",
+            "command": "${workspaceFolder}/build.sh",
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "build (Linux: install)",
+            "type": "shell",
+            "command": "${workspaceFolder}/build.sh",
+            "args": ["--install"],
+            "problemMatcher": [],
+            "group": "build"
+        }
+    ]
+}
